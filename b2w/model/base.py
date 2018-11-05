@@ -2,6 +2,7 @@ from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 
 from pymongo import MongoClient
+from bson import json_util
 from tornado.ioloop import IOLoop
 
 
@@ -9,6 +10,7 @@ class BaseModel:
 
     _client = MongoClient()
     _executor = ThreadPoolExecutor(max_workers=10)
+    LIMIT = 10
 
     @classmethod
     def database(cls):
@@ -30,6 +32,15 @@ class BaseModel:
             return collection.find_one(query)
         document = await cls._run(_find, query)
         return cls(**document)
+
+    @classmethod
+    async def list(cls, page):
+        def _list(collection, skip, limit):
+            cursor = collection.find()
+            cursor.skip(skip).limit(limit).sort('_id')
+            return [document for document in cursor]
+        skip = (page - 1) * cls.LIMIT if page > 0 else 0
+        return await cls._run(_list, skip, cls.LIMIT)
 
     async def insert(self):
         def _insert(collection, data):

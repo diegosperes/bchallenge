@@ -2,6 +2,7 @@ import json
 from tornado.web import RequestHandler
 from bson.objectid import ObjectId
 from bson.errors import InvalidId 
+from bson import json_util
 
 
 def normalize(data):
@@ -27,8 +28,10 @@ class Handler(RequestHandler):
         model = await self._find(_id)
         if model:
             data = model.data
-            data['id'] = _id
+            data['_id'] = _id
             self.finish(data)
+        elif not _id:
+            await self._list()
         else:
             self._not_found()
 
@@ -49,6 +52,16 @@ class Handler(RequestHandler):
             await model.delete()
         else:
             self._not_found()
+
+    async def _list(self):
+        result = {}
+        page = int(normalize(self.get_argument('page', [0])))
+        result['result'] = await self.model.list(page)
+        if len(result['result']) == self.model.LIMIT:
+            result['next'] = page + 1
+        if page > 1:
+            result['previous'] = page - 1
+        self.finish(json_util.dumps(result))
 
     async def _update(self, _id):
         model = await self._find(_id)

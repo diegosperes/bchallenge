@@ -1,4 +1,4 @@
-import functools
+import functools, json
 from urllib.parse import urlencode
 from tornado.testing import AsyncHTTPTestCase, gen_test
 from tornado.httpclient import HTTPClientError

@@ -1,3 +1,4 @@
+import json
 from tornado.testing import AsyncTestCase, gen_test
 from b2w.model.base import BaseModel
 
@@ -26,7 +27,21 @@ class BaseModelTestCase(AsyncTestCase):
 
     def test_get_collection(self):
         self.assertEqual('staff', self.collection.name)
+
+    @gen_test
+    async def test_list(self):
+        for letter in 'abcdefghijklm':
+            self.collection.insert_one({'name': letter})
+
+        documents = (await Staff.list(0))
+        self.assertEqual(10, len(documents))
     
+        documents = (await Staff.list(1))
+        self.assertEqual(10, len(documents))
+
+        documents = (await Staff.list(2))
+        self.assertEqual(4, len(documents))
+
     @gen_test
     async def test_find(self):
         model = await Staff.find(name=self.document['name'])
