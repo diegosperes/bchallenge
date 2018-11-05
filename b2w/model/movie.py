@@ -2,6 +2,6 @@ from b2w.model.base import BaseModel
 
 
 class Movie(BaseModel):
-    @propert
+    @property
     def data(self):
         return {'name': self.name}

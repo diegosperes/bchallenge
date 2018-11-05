@@ -2,6 +2,6 @@ from b2w.model.base import BaseModel
 
 
 class Terrain(BaseModel):
-    @prperty
+    @property
     def data(self):
-        return {'type': self.type}
+        return {'name': self.name}
