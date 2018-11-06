@@ -63,7 +63,7 @@ class Handler(RequestHandler):
 
     async def _list(self):
         result = {}
-        page = int(normalize(self.get_argument('page', [0])))
+        page = self._get_page()
         result['result'] = await self.model.list(page)
         if len(result['result']) == self.model.LIMIT:
             result['next'] = page + 1
@@ -85,6 +85,13 @@ class Handler(RequestHandler):
             return await self.model.find(_id=ObjectId(_id))
         except (TypeError, InvalidId):
             pass
+
+    def _get_page(self):
+        page = normalize(self.get_argument('page', [0]))
+        try:
+            return int(page)
+        except ValueError:
+            return 0
 
     def _not_found(self):
         self.set_status(404)
