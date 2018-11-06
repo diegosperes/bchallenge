@@ -6,10 +6,6 @@ from tornado.httpclient import HTTPClientError
 from b2w.server import make_app
 
 
-def _route(model):
-    return model.collection().name
-
-
 def database(name):
     def wrapper(test):
         @functools.wraps(test)
@@ -159,7 +155,8 @@ class HandlerTestCase:
 
     async def request(self, _id, **kwargs):
         try:
-            url = self.get_url('/{0}/{1}'.format(_route(self.model), _id))
+            route = self.model.collection().name
+            url = self.get_url('/{0}/{1}'.format(route, _id))
             return await self.http_client.fetch(url, **kwargs)
         except HTTPClientError as exception:
             return exception
