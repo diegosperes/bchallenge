@@ -1,9 +1,11 @@
-import functools, json
+import functools, json, logging
 from urllib.parse import urlencode
 from tornado.testing import AsyncHTTPTestCase, gen_test
 from tornado.httpclient import HTTPClientError
 
 from b2w.server import make_app
+
+logging.getLogger("tornado.access").setLevel(logging.CRITICAL)
 
 
 def create(names, test_case):
