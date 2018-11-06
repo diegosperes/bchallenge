@@ -1,4 +1,4 @@
-import json
+import json, ast
 from tornado.web import RequestHandler
 from bson.objectid import ObjectId
 from bson.errors import InvalidId 
@@ -17,11 +17,19 @@ class Handler(RequestHandler):
 
     @property
     def data(self):
+        body = self.request.body.decode()
         try:
-            return json.loads(self.request.body.decode())
+            return json.loads(body)
         except json.decoder.JSONDecodeError:
-            return {key: normalize(self.get_arguments(key))
-                    for key in self.request.arguments}
+            pass
+
+        try:
+            return ast.literal_eval(body)
+        except (ValueError, SyntaxError):
+            pass
+
+        return {key: normalize(self.get_arguments(key))
+                for key in self.request.arguments}
 
     async def get(self, _id):
         self.set_header('Content-Type', 'application/json')

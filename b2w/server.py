@@ -4,6 +4,7 @@ import tornado.web
 from b2w.handler.movie import MovieHandler
 from b2w.handler.climate import ClimateHandler
 from b2w.handler.terrain import TerrainHandler
+from b2w.handler.planet import PlanetHandler
 
 
 def make_app():
@@ -11,4 +12,5 @@ def make_app():
         (r"/movie[/]?(\w+)?", MovieHandler),
         (r"/climate[/]?(\w+)?", ClimateHandler),
         (r"/terrain[/]?(\w+)?", TerrainHandler),
+        (r"/planet[/]?(\w+)?", PlanetHandler),
     ])

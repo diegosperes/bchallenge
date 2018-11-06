@@ -55,6 +55,8 @@ class HandlerTestCase:
     @gen_test
     async def test_insert_model(self):
         body = self.data['test_insert_model']
+        if self.model.__name__ == 'Planet':
+            await self.http_client.fetch('http://localhost:8000/planet/', method='POST', body=urlencode(body))
         await self.request('', method='POST', body=urlencode(body))
         model = self.model.collection().find_one(body)
         self.assertTrue(model)
