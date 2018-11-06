@@ -6,15 +6,24 @@ from tornado.httpclient import HTTPClientError
 from b2w.server import make_app
 
 
-def database(name):
+def create(names, test_case):
+    _ids = []
+    for name in names:
+        data = test_case.factory(name)
+        _id = test_case.model.collection().insert_one(data).inserted_id
+        _ids.append(_id)
+    return _ids
+
+
+def database(name, many=False):
     def wrapper(test):
         @functools.wraps(test)
         async def _wrapp(test_case):
-            data = test_case.factory(wrapper.name)
-            _id = test_case.model.collection().insert_one(data).inserted_id
-            await test(test_case, _id)
+            _ids = create(wrapper.names, test_case)
+            await test(test_case, _ids)
         return gen_test(_wrapp)
-    wrapper.name = name
+    suffixes = 'abcdefghijklm' if many else ' '
+    wrapper.names = [name + suffix for suffix in suffixes]
     return wrapper
 
 
@@ -27,8 +36,8 @@ class HandlerTestCase:
        return make_app() 
 
     @database('Black')
-    async def test_get_model(self, _id):
-        response = await self.request(_id, method='GET')
+    async def test_get_model(self, _ids):
+        response = await self.request(_ids[0], method='GET')
         self.assertTrue(response.body)
 
     @gen_test
@@ -57,15 +66,15 @@ class HandlerTestCase:
         self.assertEqual(b'{}', error.response.body)
 
     @database('Green')
-    async def test_update_model(self, _id):
+    async def test_update_model(self, _ids):
         expected = self.factory('Purple')
-        await self.request(_id, method='POST', body=urlencode(expected))
-        model = self.model.collection().find_one({'_id': _id})
+        await self.request(_ids[0], method='POST', body=urlencode(expected))
+        model = self.model.collection().find_one({'_id': _ids[0]})
         self.assertEqual(expected['name'], model['name'])
 
     @database('Orange')
-    async def test_update_without_data(self, _id):
-        error = await self.request(_id, method='POST', body=urlencode({}))
+    async def test_update_without_data(self, _ids):
+        error = await self.request(_ids[0], method='POST', body=urlencode({}))
         self.assertEqual(400, error.response.code)
         self.assertEqual(b'{}', error.response.body)
 
@@ -84,9 +93,9 @@ class HandlerTestCase:
         self.assertEqual(b'{}', error.response.body)
 
     @database('Red')
-    async def test_delete_model(self, _id):
-        await self.request(_id, method='DELETE')
-        model = self.model.collection().find_one({'_id': _id})
+    async def test_delete_model(self, _ids):
+        await self.request(_ids[0], method='DELETE')
+        model = self.model.collection().find_one({'_id': _ids[0]})
         self.assertFalse(model)
 
     @gen_test
@@ -107,51 +116,47 @@ class HandlerTestCase:
         self.assertEqual(b'{"result": []}', response.body)
 
     @database('White')
-    async def test_get_first_page_with_invalid_page_value(self, _id):
+    async def test_get_first_page_with_invalid_page_value(self, _ids):
         response = await self.request('?page=a', method='GET')
         result = json.loads(response.body)
         self.assertEqual(1, len(result['result']))
-        self.assertEqual(str(_id), result['result'][0]['_id']['$oid'])
+        self.assertEqual(str(_ids[0]), result['result'][0]['_id']['$oid'])
 
-    @gen_test
-    async def test_get_list_without_page(self):
-        for letter in 'abcdefghijklm':
-            data = self.factory('White snow')
-            data['name'] += letter
-            self.model.collection().insert_one(data)
+    @database('White snow', many=True)
+    async def test_get_list_without_page(self, _ids):
         response = await self.request('', method='GET')
         result = json.loads(response.body)
         self.assertEqual(10, len(result['result']))
 
-    @gen_test
-    async def test_get_zero_page(self):
-        for letter in 'abcdefghijklm':
-            data = self.factory('Silver')
-            data['name'] += letter
-            self.model.collection().insert_one(data)
+    @database('Silver', many=True)
+    async def test_get_zero_page(self, _ids):
         response = await self.request('?page=0', method='GET')
         result = json.loads(response.body)
         self.assertEqual(10, len(result['result']))
 
-    @gen_test
-    async def test_get_first_page(self):
-        for letter in 'abcdefghijklm':
-            data = self.factory('Gray')
-            data['name'] += letter
-            self.model.collection().insert_one(data)
+    @database('Gray', many=True)
+    async def test_get_first_page(self, _ids):
         response = await self.request('?page=1', method='GET')
         result = json.loads(response.body)
         self.assertEqual(10, len(result['result']))
 
-    @gen_test
-    async def test_get_second_page(self):
-        for letter in 'abcdefghijklm':
-            data = self.factory('Yellow')
-            data['name'] += letter
-            self.model.collection().insert_one(data)
+    @database('Yellow', many=True)
+    async def test_get_second_page(self, _ids):
         response = await self.request('?page=2', method='GET')
         result = json.loads(response.body)
         self.assertEqual(3, len(result['result']))
+
+    @database('Space Gray', many=True)
+    async def test_show_next_page(self, _ids):
+        response = await self.request('?page=1', method='GET')
+        result = json.loads(response.body)
+        self.assertEqual(2, result['next'])
+
+    @database('Ocean Blue', many=True)
+    async def test_show_previous_page(self, _ids):
+        response = await self.request('?page=2', method='GET')
+        result = json.loads(response.body)
+        self.assertEqual(1, result['previous'])
 
     async def request(self, _id, **kwargs):
         try:
