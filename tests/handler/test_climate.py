@@ -1,10 +1,10 @@
 from tornado.testing import AsyncHTTPTestCase
 
-from base import HandlerTestCase
-from b2w.model.movie import Movie
+from tests.handler import HandlerTestCase
+from b2w.model.climate import Climate
 
 
-class MovieHandlerTestCase(HandlerTestCase, AsyncHTTPTestCase):
+class ClimateHandlerTestCase(HandlerTestCase, AsyncHTTPTestCase):
 
     @staticmethod
     def factory(name):
@@ -14,4 +14,4 @@ class MovieHandlerTestCase(HandlerTestCase, AsyncHTTPTestCase):
 
     @property
     def model(self):
-        return Movie
+        return Climate

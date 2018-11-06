@@ -1,7 +1,7 @@
 from urllib.parse import urlencode
 from tornado.testing import AsyncHTTPTestCase, gen_test
 
-from base import HandlerTestCase
+from tests.handler import HandlerTestCase
 from b2w.model.planet import Planet
 
 
