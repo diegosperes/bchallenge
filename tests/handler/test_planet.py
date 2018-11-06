@@ -5,15 +5,6 @@ from tests.handler import HandlerTestCase
 from b2w.model.planet import Planet
 
 
-def planet(name):
-    return {
-        'name': name,
-        'climate': ["5be0622e08301fc814313d48"],
-        'terrain': ["1be0663e18876fc814313d49"],
-        'movie': ["3be0999e18876fc814313d23"],
-    }
-
-
 class PlanetHandlerTestCase(HandlerTestCase, AsyncHTTPTestCase):
 
     @staticmethod
@@ -31,7 +22,7 @@ class PlanetHandlerTestCase(HandlerTestCase, AsyncHTTPTestCase):
 
     @gen_test
     async def test_validate_id_in_climate(self):
-        body = planet('Validate climate Planet')
+        body = self.factory('Validate climate Planet')
         body['climate'][0] = '12345'
         error = await self.request('', method='POST', body=urlencode(body))
         self.assertEqual(400, error.response.code)
@@ -39,7 +30,7 @@ class PlanetHandlerTestCase(HandlerTestCase, AsyncHTTPTestCase):
 
     @gen_test
     async def test_validate_id_in_terrain(self):
-        body = planet('Validate terrain Planet')
+        body = self.factory('Validate terrain Planet')
         body['terrain'][0] = '54321'
         error = await self.request('', method='POST', body=urlencode(body))
         self.assertEqual(400, error.response.code)
@@ -47,7 +38,7 @@ class PlanetHandlerTestCase(HandlerTestCase, AsyncHTTPTestCase):
 
     @gen_test
     async def test_validate_id_in_movie(self):
-        body = planet('Validate movie Planet')
+        body = self.factory('Validate movie Planet')
         body['movie'][0] = '67890'
         error = await self.request('', method='POST', body=urlencode(body))
         self.assertEqual(400, error.response.code)
