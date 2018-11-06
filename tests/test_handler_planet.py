@@ -1,4 +1,5 @@
-from tornado.testing import AsyncHTTPTestCase
+from urllib.parse import urlencode
+from tornado.testing import AsyncHTTPTestCase, gen_test
 
 from base import HandlerTestCase
 from b2w.model.planet import Planet
@@ -30,3 +31,27 @@ class PlanetHandlerTestCase(HandlerTestCase, AsyncHTTPTestCase):
             'test_update_with_invalid_id': planet('Brown Planet'),
             'test_update_without_data': planet('Orange Planet')
         }
+
+    @gen_test
+    async def test_validate_id_in_climate(self):
+        body = planet('Validate climate Planet')
+        body['climate'][0] = '12345'
+        error = await self.request('', method='POST', body=urlencode(body))
+        self.assertEqual(400, error.response.code)
+        self.assertEqual(b'{}', error.response.body)
+
+    @gen_test
+    async def test_validate_id_in_terrain(self):
+        body = planet('Validate terrain Planet')
+        body['terrain'][0] = '54321'
+        error = await self.request('', method='POST', body=urlencode(body))
+        self.assertEqual(400, error.response.code)
+        self.assertEqual(b'{}', error.response.body)
+
+    @gen_test
+    async def test_validate_id_in_movie(self):
+        body = planet('Validate movie Planet')
+        body['movie'][0] = '67890'
+        error = await self.request('', method='POST', body=urlencode(body))
+        self.assertEqual(400, error.response.code)
+        self.assertEqual(b'{}', error.response.body)
