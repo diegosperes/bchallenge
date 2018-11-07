@@ -31,6 +31,10 @@ def database(name, many=False):
 
 class HandlerTestCase:
 
+    def setUp(self):
+        super().setUp()
+        self.model.database = lambda: 'test_database'
+
     def tearDown(self):
         self.model.collection().drop()
 
