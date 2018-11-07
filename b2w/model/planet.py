@@ -26,4 +26,4 @@ class Planet(BaseModel):
         return ast.literal_eval(value) if type(value) is str else value
 
     def _validate(self):
-        [ObjectId(_id) for _id in self.climate + self.movie + self.terrain]
+        [ObjectId(_id) for _id in self.movie]

@@ -3,8 +3,6 @@ from tornado.httpclient import AsyncHTTPClient
 from tornado.ioloop import IOLoop
 
 from b2w.model.planet import Planet
-from b2w.model.terrain import Terrain
-from b2w.model.climate import Climate
 from b2w.model.movie import Movie
 
 
@@ -53,18 +51,10 @@ async def run():
             planets.append(document)
         next_url = result['next']
 
-    for terrain in terrains:
-        await Terrain(name=terrain).insert()
-
-    for climate in climates:
-        await Climate(name=climate).insert()
-
     for movie in movies:
         await Movie(name=movie).insert()
 
     for planet in planets:
-        planet['terrain'] = [await find_id(Terrain, terrain) for terrain in planet['terrain']]
-        planet['climate'] = [await find_id(Climate, climate) for climate in planet['climate']]
         planet['movie'] = [await find_id(Movie, movie) for movie in planet['movie']]
         await Planet(**planet).insert()
 

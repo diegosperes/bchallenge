@@ -21,22 +21,6 @@ class PlanetHandlerTestCase(HandlerTestCase, AsyncHTTPTestCase):
         return Planet
 
     @gen_test
-    async def test_validate_id_in_climate(self):
-        body = self.factory('Validate climate Planet')
-        body['climate'][0] = '12345'
-        error = await self.request('', method='POST', body=urlencode(body))
-        self.assertEqual(400, error.response.code)
-        self.assertEqual(b'{}', error.response.body)
-
-    @gen_test
-    async def test_validate_id_in_terrain(self):
-        body = self.factory('Validate terrain Planet')
-        body['terrain'][0] = '54321'
-        error = await self.request('', method='POST', body=urlencode(body))
-        self.assertEqual(400, error.response.code)
-        self.assertEqual(b'{}', error.response.body)
-
-    @gen_test
     async def test_validate_id_in_movie(self):
         body = self.factory('Validate movie Planet')
         body['movie'][0] = '67890'
