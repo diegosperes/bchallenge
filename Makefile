@@ -1,7 +1,7 @@
 .PHONY: tests
 
 run:
-	@python server.py
+	@python -m b2w.server
 
 tests:
 	@python -m unittest discover tests -p 'test*'
