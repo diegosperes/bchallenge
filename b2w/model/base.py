@@ -6,6 +6,12 @@ from bson import json_util
 from tornado.ioloop import IOLoop
 
 
+def serialize(model, document):
+    data = model(**document).data
+    data['id'] = str(document['_id'])
+    return data
+
+
 class BaseModel:
 
     _client = MongoClient()
@@ -38,7 +44,7 @@ class BaseModel:
         def _list(collection, skip, limit):
             cursor = collection.find()
             cursor.skip(skip).limit(limit).sort('_id')
-            return [document for document in cursor]
+            return [serialize(cls, document) for document in cursor]
         skip = (page - 1) * cls.LIMIT if page > 0 else 0
         return await cls._run(_list, skip, cls.LIMIT)
 

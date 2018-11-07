@@ -7,7 +7,12 @@ class Planet(BaseModel):
 
     @property
     def data(self):
-        return {'name': self.name, 'climate': self.climate, 'terrain': self.terrain, 'movie': self.movie}
+        return {
+            'name': self.name,
+            'climate': [str(climate) for climate in self.climate],
+            'terrain': [str(terrain) for terrain in self.terrain],
+            'movie': [str(movie) for movie in self.movie]
+        }
 
     def __init__(self, **kwargs):
         kwargs['climate'] = self._normalize(kwargs, 'climate')

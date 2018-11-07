@@ -36,7 +36,7 @@ class Handler(RequestHandler):
         model = await self._find(_id)
         if model:
             data = model.data
-            data['_id'] = _id
+            data['id'] = _id
             self.finish(data)
         elif not _id:
             await self._list()

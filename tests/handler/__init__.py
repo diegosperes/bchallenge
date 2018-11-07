@@ -122,7 +122,7 @@ class HandlerTestCase:
         response = await self.request('?page=a', method='GET')
         result = json.loads(response.body)
         self.assertEqual(1, len(result['result']))
-        self.assertEqual(str(_ids[0]), result['result'][0]['_id']['$oid'])
+        self.assertEqual(str(_ids[0]), result['result'][0]['id'])
 
     @database('White snow', many=True)
     async def test_get_list_without_page(self, _ids):
