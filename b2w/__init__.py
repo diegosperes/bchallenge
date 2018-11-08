@@ -1,8 +1,8 @@
-import importlib, os
-from tornado.options import options
-importlib.import_module('b2w.settings.' + os.environ.get('ENV', None)) 
-
+import importlib
+import os
 from urllib.parse import urlencode
+from tornado.options import options
+importlib.import_module('b2w.settings.' + os.environ.get('ENV', None))
 
 
 def uri(model, _id, **kwargs):

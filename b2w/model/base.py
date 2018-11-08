@@ -1,8 +1,6 @@
-from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 
 from pymongo import MongoClient
-from bson import json_util
 from tornado.options import options
 from tornado.ioloop import IOLoop
 

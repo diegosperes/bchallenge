@@ -1,6 +1,8 @@
-import functools, json, logging
+import functools
+import json
+import logging
 from urllib.parse import urlencode
-from tornado.testing import AsyncHTTPTestCase, gen_test
+from tornado.testing import gen_test
 from tornado.httpclient import HTTPClientError
 from tornado.options import options
 
@@ -36,7 +38,7 @@ class HandlerTestCase:
         self.model.collection().drop()
 
     def get_app(self):
-       return make_app() 
+        return make_app()
 
     @database('Black')
     async def test_get_model(self, _ids):

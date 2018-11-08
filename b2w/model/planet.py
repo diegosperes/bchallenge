@@ -1,5 +1,4 @@
 import ast
-from tornado.options import options
 from bson.objectid import ObjectId
 from b2w.model.base import BaseModel
 from b2w.model.movie import Movie
@@ -10,7 +9,7 @@ def lookup(query):
     return [
         {"$match": query},
         {"$unwind": "$movie"},
-        {"$addFields": { "movie": { "$toObjectId": "$movie" }}},
+        {"$addFields": {"movie": {"$toObjectId": "$movie"}}},
         {
             "$lookup": {
                 "from": "movie",
@@ -71,7 +70,7 @@ class Planet(BaseModel):
 
     def _normalize(self, kwargs, key, model=None):
         value = kwargs.get(key, [])
-        value =  ast.literal_eval(value) if type(value) is str else value
+        value = ast.literal_eval(value) if type(value) is str else value
         normalized = []
         for item in value:
             if type(item) is dict:

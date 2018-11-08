@@ -1,8 +1,8 @@
-import json, ast
+import json
+import ast
 from tornado.web import RequestHandler
-from tornado.options import options
 from bson.objectid import ObjectId
-from bson.errors import InvalidId 
+from bson.errors import InvalidId
 from bson import json_util
 from b2w import uri
 
@@ -15,7 +15,7 @@ class Handler(RequestHandler):
 
     @property
     def model(self):
-        raise NotImplemented()
+        raise NotImplementedError()
 
     @property
     def data(self):
