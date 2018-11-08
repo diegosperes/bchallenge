@@ -60,7 +60,7 @@ class PlanetHandlerTestCase(HandlerTestCase, AsyncHTTPTestCase):
         self.assertEqual(expected['climate'], result['climate'])
         self.assertEqual(expected['terrain'], result['terrain'])
         self.assertEqual(name, result['movie'][0]['name'])
-        self.assertTrue(result['movie'][0]['id'])
+        self.assertTrue(result['movie'][0]['uri'])
         self.assertTrue(result['id'])
 
     async def add_valid_movie(self, planet_id, movie_name):

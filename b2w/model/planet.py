@@ -57,23 +57,25 @@ class Planet(BaseModel):
     async def list(cls, page):
         planets = await super().list(page)
         for planet in planets:
-            for index, movie_id in enumerate(planet.get('movie', [])):
-                planet['movie'][index] = uri(Movie, movie_id)
+            del planet['terrain']
+            del planet['climate']
+            del planet['movie']
         return planets
 
     def __init__(self, **kwargs):
         kwargs['climate'] = self._normalize(kwargs, 'climate')
-        kwargs['movie'] = self._normalize(kwargs, 'movie')
+        kwargs['movie'] = self._normalize(kwargs, 'movie', model=Movie)
         kwargs['terrain'] = self._normalize(kwargs, 'terrain')
         super().__init__(**kwargs)
         self._validate()
 
-    def _normalize(self, kwargs, key):
+    def _normalize(self, kwargs, key, model=None):
         value = kwargs.get(key, [])
         value =  ast.literal_eval(value) if type(value) is str else value
         normalized = []
         for item in value:
             if type(item) is dict:
+                item['uri'] = uri(model, item['_id'])
                 item['id'] = str(item['_id'])
                 del item['_id']
             normalized.append(item)
@@ -81,6 +83,5 @@ class Planet(BaseModel):
 
     def _validate(self):
         for value in self.movie:
-            if type(value) is dict:
-                value = value['id']
-            ObjectId(value)
+            if type(value) is not dict:
+                ObjectId(value)

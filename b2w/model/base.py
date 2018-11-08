@@ -12,6 +12,7 @@ from b2w import uri
 def serialize(model, document):
     data = model(**document).data
     data['uri'] = uri(model, document['_id'])
+    data['id'] = str(document['_id'])
     return data
 
 
