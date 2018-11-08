@@ -4,6 +4,7 @@ from tornado.ioloop import IOLoop
 
 from b2w.model.planet import Planet
 from b2w.model.movie import Movie
+import pymongo
 
 
 planets = []
@@ -51,12 +52,14 @@ async def run():
             planets.append(document)
         next_url = result['next']
 
+    Movie.collection().create_index([("name", pymongo.TEXT)])
     for movie in movies.values():
         movie['name'] = movie['title']
         movie['released'] = movie['release_date']
         movie['producer'] = normalize(movie['producer'])
         await Movie(**movie).insert()
 
+    Planet.collection().create_index([("name", pymongo.TEXT)])
     for planet in planets:
         planet['movie'] = [await find_id(Movie, movie) for movie in planet['movie']]
         await Planet(**planet).insert()

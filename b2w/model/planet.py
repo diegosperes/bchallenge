@@ -53,8 +53,8 @@ class Planet(BaseModel):
         return cls(**document)
 
     @classmethod
-    async def list(cls, page):
-        planets = await super().list(page)
+    async def list(cls, page, **kwargs):
+        planets = await super().list(page, **kwargs)
         for planet in planets:
             for index, movie in enumerate(planet['movie']):
                 planet['movie'][index] = str(movie)

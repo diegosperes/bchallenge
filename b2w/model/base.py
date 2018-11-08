@@ -38,13 +38,14 @@ class BaseModel:
         return cls(**document)
 
     @classmethod
-    async def list(cls, page):
-        def _list(collection, skip, limit):
-            cursor = collection.find()
+    async def list(cls, page, name=None):
+        def _list(collection, skip, limit, query):
+            cursor = collection.find(query)
             cursor.skip(skip).limit(limit).sort('_id')
             return [serialize(cls, document) for document in cursor]
         skip = (page - 1) * cls.LIMIT if page > 0 else 0
-        return await cls._run(_list, skip, cls.LIMIT)
+        query = {"$text": {"$search": name}} if name else {}
+        return await cls._run(_list, skip, cls.LIMIT, query)
 
     async def insert(self):
         def _insert(collection, data):

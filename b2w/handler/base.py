@@ -66,7 +66,8 @@ class Handler(RequestHandler):
     async def _list(self):
         result = {}
         page = self._get_page()
-        result['result'] = await self.model.list(page)
+        name = self.get_argument('name', None)
+        result['result'] = await self.model.list(page, name=name)
         if len(result['result']) == self.model.LIMIT:
             result['next'] = uri(self.model, None, page=page + 1)
         if page > 1:

@@ -1,6 +1,7 @@
 import functools
 import json
 import logging
+import pymongo
 from urllib.parse import urlencode
 from tornado.testing import gen_test
 from tornado.httpclient import HTTPClientError
@@ -168,6 +169,13 @@ class HandlerTestCase:
         route = self.model.collection().name
         expected = '{0}/{1}?page=1'.format(options.host, route)
         self.assertEqual(expected, result['previous'])
+
+    @database('Dark matter')
+    async def test_search_by_name(self, _ids):
+        self.model.collection().create_index([('name', pymongo.TEXT)])
+        response = await self.request('?name=matter', method='GET')
+        result = json.loads(response.body)
+        self.assertEqual(1, len(result['result']))
 
     async def request(self, _id, **kwargs):
         try:
