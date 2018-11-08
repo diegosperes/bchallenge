@@ -1,5 +1,6 @@
 import tornado.ioloop
 import tornado.web
+from tornado.options import options
 
 from b2w.handler.movie import MovieHandler
 from b2w.handler.planet import PlanetHandler
@@ -14,5 +15,5 @@ def make_app():
 
 if __name__ == '__main__':
     app = make_app()
-    app.listen(8000)
+    app.listen(options.port)
     tornado.ioloop.IOLoop.current().start()

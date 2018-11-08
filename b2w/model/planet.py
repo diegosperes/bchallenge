@@ -1,5 +1,5 @@
 import ast
-from bson import json_util
+from tornado.options import options
 from bson.objectid import ObjectId
 from b2w.model.base import BaseModel
 from b2w.model.movie import Movie
@@ -39,7 +39,7 @@ class Planet(BaseModel):
             'name': self.name,
             'climate': self.climate,
             'terrain': self.terrain,
-            'movie': [movie for movie in self.movie]
+            'movie': self.movie
         }
 
     @classmethod
@@ -54,11 +54,11 @@ class Planet(BaseModel):
 
     @classmethod
     async def list(cls, page):
-        movie_url = 'http://localhost:8000/movie/{0}'
+        movie_url = '{0}/movie/{1}'
         planets = await super().list(page)
         for planet in planets:
             for index, movie_id in enumerate(planet.get('movie', [])):
-                planet['movie'][index] = movie_url.format(movie_id)
+                planet['movie'][index] = movie_url.format(options.host, movie_id)
         return planets
 
     def __init__(self, **kwargs):

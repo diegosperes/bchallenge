@@ -3,6 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from pymongo import MongoClient
 from bson import json_util
+from tornado.options import options
 from tornado.ioloop import IOLoop
 
 
@@ -14,17 +15,13 @@ def serialize(model, document):
 
 class BaseModel:
 
-    _client = MongoClient()
+    _client = MongoClient(options.mongo_uri)
     _executor = ThreadPoolExecutor(max_workers=10)
     LIMIT = 10
 
     @classmethod
-    def database(cls):
-        return 'star_wars'
-
-    @classmethod
     def collection(cls):
-        database = cls.database()
+        database = options.mongo_database
         collection = cls.__name__.lower()
         return cls._client[database][collection]
 

@@ -1,10 +1,10 @@
 .PHONY: tests
 
 run:
-	@python -m b2w.server
+	@ENV=local python -m b2w.server
 
 migrations:
-	@python -m b2w.migrations
+	@ENV=local python -m b2w.migrations
 
 tests:
-	@python -m unittest discover tests -p 'test*'
+	@ENV=tests python -m unittest discover tests -p 'test*'

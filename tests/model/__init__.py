@@ -1,6 +1,5 @@
 import json
 from tornado.testing import gen_test
-from b2w.model.base import BaseModel
 
 
 class ModelTestCase:
@@ -8,7 +7,6 @@ class ModelTestCase:
     def setUp(self):
         super().setUp()
         name = 'Blue'
-        self.model.database = lambda: 'test_database'
         self.collection = self.model.collection()
         self.collection.insert_one(self.factory(name))
         self.document = self.collection.find_one({'name': name})
