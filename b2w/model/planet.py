@@ -3,6 +3,7 @@ from tornado.options import options
 from bson.objectid import ObjectId
 from b2w.model.base import BaseModel
 from b2w.model.movie import Movie
+from b2w import uri
 
 
 def lookup(query):
@@ -54,11 +55,10 @@ class Planet(BaseModel):
 
     @classmethod
     async def list(cls, page):
-        movie_url = '{0}/movie/{1}'
         planets = await super().list(page)
         for planet in planets:
             for index, movie_id in enumerate(planet.get('movie', [])):
-                planet['movie'][index] = movie_url.format(options.host, movie_id)
+                planet['movie'][index] = uri(Movie, movie_id)
         return planets
 
     def __init__(self, **kwargs):

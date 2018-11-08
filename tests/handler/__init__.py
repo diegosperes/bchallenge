@@ -2,6 +2,7 @@ import functools, json, logging
 from urllib.parse import urlencode
 from tornado.testing import AsyncHTTPTestCase, gen_test
 from tornado.httpclient import HTTPClientError
+from tornado.options import options
 
 from b2w.server import make_app
 
@@ -122,7 +123,9 @@ class HandlerTestCase:
         response = await self.request('?page=a', method='GET')
         result = json.loads(response.body)
         self.assertEqual(1, len(result['result']))
-        self.assertEqual(str(_ids[0]), result['result'][0]['id'])
+        route = self.model.collection().name
+        expected = '{0}/{1}/{2}'.format(options.host, route, _ids[0])
+        self.assertEqual(expected, result['result'][0]['uri'])
 
     @database('White snow', many=True)
     async def test_get_list_without_page(self, _ids):
@@ -152,13 +155,17 @@ class HandlerTestCase:
     async def test_show_next_page(self, _ids):
         response = await self.request('?page=1', method='GET')
         result = json.loads(response.body)
-        self.assertEqual(2, result['next'])
+        route = self.model.collection().name
+        expected = '{0}/{1}?page=2'.format(options.host, route)
+        self.assertEqual(expected, result['next'])
 
     @database('Ocean Blue', many=True)
     async def test_show_previous_page(self, _ids):
         response = await self.request('?page=2', method='GET')
         result = json.loads(response.body)
-        self.assertEqual(1, result['previous'])
+        route = self.model.collection().name
+        expected = '{0}/{1}?page=1'.format(options.host, route)
+        self.assertEqual(expected, result['previous'])
 
     async def request(self, _id, **kwargs):
         try:

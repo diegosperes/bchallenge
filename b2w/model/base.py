@@ -6,10 +6,12 @@ from bson import json_util
 from tornado.options import options
 from tornado.ioloop import IOLoop
 
+from b2w import uri
+
 
 def serialize(model, document):
     data = model(**document).data
-    data['id'] = str(document['_id'])
+    data['uri'] = uri(model, document['_id'])
     return data
 
 

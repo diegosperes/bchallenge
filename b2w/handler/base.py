@@ -1,8 +1,10 @@
 import json, ast
 from tornado.web import RequestHandler
+from tornado.options import options
 from bson.objectid import ObjectId
 from bson.errors import InvalidId 
 from bson import json_util
+from b2w import uri
 
 
 def normalize(data):
@@ -66,9 +68,9 @@ class Handler(RequestHandler):
         page = self._get_page()
         result['result'] = await self.model.list(page)
         if len(result['result']) == self.model.LIMIT:
-            result['next'] = page + 1
+            result['next'] = uri(self.model, None, page=page + 1)
         if page > 1:
-            result['previous'] = page - 1
+            result['previous'] = uri(self.model, None, page=page - 1)
         self.finish(json_util.dumps(result))
 
     async def _update(self, _id):
@@ -87,7 +89,7 @@ class Handler(RequestHandler):
             pass
 
     def _get_page(self):
-        page = normalize(self.get_argument('page', [0]))
+        page = normalize(self.get_argument('page', [1]))
         try:
             return int(page)
         except ValueError:
