@@ -1,6 +1,34 @@
 import ast
+from bson import json_util
 from bson.objectid import ObjectId
 from b2w.model.base import BaseModel
+from b2w.model.movie import Movie
+
+
+def lookup(query):
+    return [
+        {"$match": query},
+        {"$unwind": "$movie"},
+        {"$addFields": { "movie": { "$toObjectId": "$movie" }}},
+        {
+            "$lookup": {
+                "from": "movie",
+                "localField": "movie",
+                "foreignField": "_id",
+                "as": "movie"
+             }
+        },
+        {"$unwind": {"path": "$movie", "preserveNullAndEmptyArrays": True}},
+        {
+             "$group": {
+                 "_id": "$_id",
+                 "name": {"$first": "$name"},
+                 "climate": {"$first": "$climate"},
+                 "terrain": {"$first": "$terrain"},
+                 "movie": {"$push": "$movie"},
+             }
+         },
+    ]
 
 
 class Planet(BaseModel):
@@ -9,10 +37,29 @@ class Planet(BaseModel):
     def data(self):
         return {
             'name': self.name,
-            'climate': [str(climate) for climate in self.climate],
-            'terrain': [str(terrain) for terrain in self.terrain],
-            'movie': [str(movie) for movie in self.movie]
+            'climate': self.climate,
+            'terrain': self.terrain,
+            'movie': [movie for movie in self.movie]
         }
+
+    @classmethod
+    async def find(cls, **query):
+        def _aggregate(collection, query):
+            try:
+                return collection.aggregate(query).next()
+            except StopIteration:
+                pass
+        document = await cls._run(_aggregate, lookup(query))
+        return cls(**document)
+
+    @classmethod
+    async def list(cls, page):
+        movie_url = 'http://localhost:8000/movie/{0}'
+        planets = await super().list(page)
+        for planet in planets:
+            for index, movie_id in enumerate(planet.get('movie', [])):
+                planet['movie'][index] = movie_url.format(movie_id)
+        return planets
 
     def __init__(self, **kwargs):
         kwargs['climate'] = self._normalize(kwargs, 'climate')
@@ -22,8 +69,18 @@ class Planet(BaseModel):
         self._validate()
 
     def _normalize(self, kwargs, key):
-        value = kwargs.get(key, '[]')
-        return ast.literal_eval(value) if type(value) is str else value
+        value = kwargs.get(key, [])
+        value =  ast.literal_eval(value) if type(value) is str else value
+        normalized = []
+        for item in value:
+            if type(item) is dict:
+                item['id'] = str(item['_id'])
+                del item['_id']
+            normalized.append(item)
+        return normalized
 
     def _validate(self):
-        [ObjectId(_id) for _id in self.movie]
+        for value in self.movie:
+            if type(value) is dict:
+                value = value['id']
+            ObjectId(value)
