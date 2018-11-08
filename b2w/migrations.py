@@ -6,28 +6,28 @@ from b2w.model.planet import Planet
 from b2w.model.movie import Movie
 
 
-terrains = set()
-climates = set()
 planets = []
-movies = set()
+movies = {}
 
 
 async def get_value(url):
     response = await AsyncHTTPClient().fetch(url)
-    result = json.loads(response.body)
-    return result['title']
+    return json.loads(response.body)
 
 
-async def append(_set, values, url=False):
+def normalize(values):
+    values = values.split(',') if type(values) is str else values
+    return [value.strip() for value in values]
+
+
+async def append_from_url(_dict, values):
     result = []
     values = values.split(',') if type(values) is str else values
     for value in values:
-        value.strip()
-        if url:
-            value = await get_value(value)
-        value = value.strip()
-        _set.add(value)
-        result.append(value)
+        value = await get_value(value)
+        title = value['title']
+        movies[title] = value
+        result.append(title)
     return result
 
 
@@ -44,15 +44,18 @@ async def run():
         response = await AsyncHTTPClient().fetch(next_url)
         result = json.loads(response.body)
         for planet in result['results']:
-            terrain = await append(terrains, planet['terrain'])
-            climate = await append(climates, planet['climate'])
-            movie = await append(movies, planet['films'], url=True)
+            terrain = normalize(planet['terrain'])
+            climate = normalize(planet['climate'])
+            movie = await append_from_url(movies, planet['films'])
             document = {'name': planet['name'], 'terrain': terrain, 'climate': climate, 'movie': movie}
             planets.append(document)
         next_url = result['next']
 
-    for movie in movies:
-        await Movie(name=movie).insert()
+    for movie in movies.values():
+        movie['name'] = movie['title']
+        movie['released'] = movie['release_date']
+        movie['producer'] = normalize(movie['producer'])
+        await Movie(**movie).insert()
 
     for planet in planets:
         planet['movie'] = [await find_id(Movie, movie) for movie in planet['movie']]

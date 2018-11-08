@@ -61,7 +61,7 @@ class HandlerTestCase:
     async def test_insert_model(self):
         body = self.factory('Blue')
         await self.request('', method='POST', body=urlencode(body))
-        model = self.model.collection().find_one(body)
+        model = self.model.collection().find_one({"name": body['name']})
         self.assertTrue(model)
 
     @gen_test

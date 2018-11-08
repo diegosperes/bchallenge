@@ -16,21 +16,21 @@ class ModelTestCase:
     @gen_test
     async def test_list(self):
         for letter in 'abcdefghijklm':
-            self.collection.insert_one({'name': letter})
+            self.collection.insert_one(self.factory(letter))
         documents = (await self.model.list(0))
         self.assertEqual(10, len(documents))
 
     @gen_test
     async def test_list_first_page(self):
         for letter in 'abcdefghijklm':
-            self.collection.insert_one({'name': letter})
+            self.collection.insert_one(self.factory(letter))
         documents = (await self.model.list(1))
         self.assertEqual(10, len(documents))
 
     @gen_test
     async def test_list_second_page(self):
         for letter in 'abcdefghijklm':
-            self.collection.insert_one({'name': letter})
+            self.collection.insert_one(self.factory(letter))
         documents = (await self.model.list(2))
         self.assertEqual(4, len(documents))
 

@@ -64,7 +64,12 @@ class PlanetHandlerTestCase(HandlerTestCase, AsyncHTTPTestCase):
         self.assertTrue(result['id'])
 
     async def add_valid_movie(self, planet_id, movie_name):
-        movie = Movie(**{"name": movie_name})
+        movie = Movie(**{
+            "name": movie_name,
+            "director": "director",
+            "producer": ["producer"],
+            "released": "2017-09-03"
+        })
         await movie.insert()
         planet = await Planet.find(_id=planet_id)
         planet.movie.append(movie._id)

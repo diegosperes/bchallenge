@@ -9,7 +9,10 @@ class MovieModelTestCase(ModelTestCase, AsyncTestCase):
     @staticmethod
     def factory(name):
         return {
-            "name": name
+            "name": name,
+            "director": "director",
+            "producer": ["producer"],
+            "released": "2017-08-09"
         }
 
     @property
