@@ -1,6 +1,6 @@
 import ast
 from bson.objectid import ObjectId
-from b2w.model.base import BaseModel
+from b2w.model.base import BaseModel, serialize
 from b2w.model.movie import Movie
 from b2w import uri
 
@@ -56,9 +56,8 @@ class Planet(BaseModel):
     async def list(cls, page):
         planets = await super().list(page)
         for planet in planets:
-            del planet['terrain']
-            del planet['climate']
-            del planet['movie']
+            for index, movie in enumerate(planet['movie']):
+                planet['movie'][index] = str(movie)
         return planets
 
     def __init__(self, **kwargs):
