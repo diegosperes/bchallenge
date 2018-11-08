@@ -68,6 +68,8 @@ class Handler(RequestHandler):
         page = self._get_page()
         name = self.get_argument('name', None)
         result['result'] = await self.model.list(page, name=name)
+        result['next'] = None
+        result['previous'] = None
         if len(result['result']) == self.model.LIMIT:
             result['next'] = uri(self.model, None, page=page + 1)
         if page > 1:

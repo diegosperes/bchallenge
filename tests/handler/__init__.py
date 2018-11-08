@@ -119,7 +119,7 @@ class HandlerTestCase:
     @gen_test
     async def test_get_empty_list(self):
         response = await self.request('', method='GET')
-        self.assertEqual(b'{"result": []}', response.body)
+        self.assertEqual(b'{"result": [], "next": null, "previous": null}', response.body)
 
     @database('White')
     async def test_get_first_page_with_invalid_page_value(self, _ids):
