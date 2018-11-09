@@ -5,7 +5,19 @@ services:
     image: mongo 
     ports:
       - "27017:27017"
-  web:
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "8080:8080"
+    links:
+      - app
+    depends_on:
+      - app
+
+  app:
     image: b2w
     environment:
       - ENV=prod
