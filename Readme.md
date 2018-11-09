@@ -1,4 +1,4 @@
-#Star Wars API da B2W
+# Star Wars API da B2W [![Build Status](https://travis-ci.com/diegosperes/bchallenge.svg?branch=master)](https://travis-ci.com/diegosperes/bchallenge)
 
 Para realizar o setup do projeto é bem simple, baster ter o docker ou uma instancia do mongodb rodando em sua maquina.
 
@@ -43,12 +43,12 @@ Como utilizar a api:
         (DELETE) http://localhost:8080/planet/{id}
         (DELETE) http://localhost:8080/movie/{id}
 
-## o que poderia ser evoluído
+## O que poderia ser evoluído
 Com o nginx na frente da aplicação é possível inserir uma camada de autenticação, verificando se o usuário está autorizado a inserir, atualizar e deletar os dados. HTTP2?
 Poderia no futuro utilizar o memcached ou redis como camada de cache para guardar os dados vindo do mongodb, existe diversos benefícios um deles é a resiliência.
 Foi criado um indice no mongo para realizar a busca por nome, infelizmente o banco de dados não suporta fuzzy queries como o elasticsearch.
 
-## como rodar os testes
+## Como rodar os testes
     make tests
 
 ## OBS
