@@ -8,7 +8,7 @@ from b2w import uri
 def lookup(query):
     return [
         {"$match": query},
-        {"$unwind": "$movie"},
+        {"$unwind": {"path": "$movie", "preserveNullAndEmptyArrays": True}},
         {"$addFields": {"movie": {"$toObjectId": "$movie"}}},
         {
             "$lookup": {
