@@ -7,7 +7,6 @@ RUN apk update \
     && apk upgrade \
     && apk add make \
     && apk add python3 \
-    && apk add nginx \
     && python3 -m ensurepip \
     && pip3 install --upgrade pip setuptools \
     && if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi \
