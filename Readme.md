@@ -14,6 +14,8 @@ Para realizar o setup do projeto é bem simple, baster ter o docker ou uma insta
 
 Uma das vantagens de utilizar o docker é que possui o nginx realizando o proxy das requisições para a aplicação, além de não existir a necessidade de instalar o mongodb nem o virtualenv - tudo isolado :)
 
+Esse projeto utilizou recursos do mongodb 4, caso algo não funcione check se o ambiente está direitinho!
+
 Como utilizar a api:
 
     Nginx -> http://localhost:8080
